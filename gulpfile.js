@@ -17,10 +17,10 @@ var autoPrefixer = require('gulp-autoprefixer'),
 //CACHE FOLDER LOCATIONS
 var src = {
     //ROOT FOLDERS
-    lib: './lib/',
+    bin: './bin/',
     dist: './dist/',
-    backup: './lib_backup/',
-    archive: './lib_archive/',
+    backup: './bin_backup/',
+    archive: './bin_archive/',
     //SUB FOLDERS
     pug: 'assets/pug/',
     css: 'assets/css/',
@@ -42,13 +42,13 @@ var saveCount = 0,
 ================================*/
 gulp.task('serve', ['sass', 'pug', 'sprite'], function () {
     browserSync.init({
-        server: src.lib
+        server: src.bin
     });
     //WATCH FOR CHANGES TO SCSS, PUG, HTML AND JS FILES AND RUN BACKUP
-    gulp.watch(src.lib + src.scss + '**/*.scss', ['sass', 'backup']);
-    gulp.watch(src.lib + src.pug + '**/*.pug', ['pug', 'backup']);
-    gulp.watch(src.lib + '*.html').on('change', browserSync.reload);
-    gulp.watch(src.lib + src.js + '*.js', ['backup']).on('change', browserSync.reload);
+    gulp.watch(src.bin + src.scss + '**/*.scss', ['sass', 'backup']);
+    gulp.watch(src.bin + src.pug + '**/*.pug', ['pug', 'backup']);
+    gulp.watch(src.bin + '*.html').on('change', browserSync.reload);
+    gulp.watch(src.bin + src.js + '*.js', ['backup']).on('change', browserSync.reload);
 });
 
 /*================================
@@ -56,22 +56,22 @@ gulp.task('serve', ['sass', 'pug', 'sprite'], function () {
 ================================*/
 
 gulp.task('image', function () {
-    return gulp.src(src.lib + src.img + '*')
+    return gulp.src(src.bin + src.img + '*')
       .pipe(image());
 });
 
 
 gulp.task('sprite', function() {
     var spriteData =
-        gulp.src(src.lib + src.icons + '*') // путь, откуда берем картинки для спрайта
+        gulp.src(src.bin + src.icons + '*') // путь, откуда берем картинки для спрайта
             .pipe(spritesmith({
                 imgName: 'sprite.png',
                 cssName: '_sprite.scss',
                 imgPath: '../img/sprite.png',
             }));
 
-    spriteData.img.pipe(gulp.dest('lib/assets/img/')); // путь, куда сохраняем картинку
-    spriteData.css.pipe(gulp.dest('lib/assets/scss/utils/')); // путь, куда сохраняем стили
+    spriteData.img.pipe(gulp.dest('bin/assets/img/')); // путь, куда сохраняем картинку
+    spriteData.css.pipe(gulp.dest('bin/assets/scss/utils/')); // путь, куда сохраняем стили
 });
 
 /*================================
@@ -79,7 +79,7 @@ gulp.task('sprite', function() {
 ================================*/
 gulp.task('sass', function () {
     //LOCATE MAIN.SCSS FILE
-    return gulp.src(src.lib + src.scss + 'main.scss')
+    return gulp.src(src.bin + src.scss + 'main.scss')
         //INIT SOURCEMAPS
         .pipe(sourcemaps.init())
         //COMPILE SCSS IF NO ERROR
@@ -89,7 +89,7 @@ gulp.task('sass', function () {
         //AUTO PREFIX
         .pipe(autoPrefixer())
         //MOVE COMPILED SCSS TO CSS FOLDER
-        .pipe(gulp.dest(src.lib + src.css))
+        .pipe(gulp.dest(src.bin + src.css))
         //RELOAD SERVER
         .pipe(browserSync.stream());
 });
@@ -98,14 +98,14 @@ gulp.task('sass', function () {
     PUG TASK
 ================================*/
 gulp.task('pug', function () {
-    return gulp.src(src.lib + src.pug + 'pages/*.pug')
+    return gulp.src(src.bin + src.pug + 'pages/*.pug')
         //COMPILE PUG
         .pipe(pug({
             //PROPER HTML INDENTATION
             pretty: true
         }))
-        //SEND TO LIB ROOT
-        .pipe(gulp.dest(src.lib));
+        //SEND TO bin ROOT
+        .pipe(gulp.dest(src.bin));
 });
 /*================================
     DISTRIBUTION TASK
@@ -121,16 +121,16 @@ gulp.task('clean', function () {
 //BUILD
 gulp.task('build', function () {
     return gulp.src([
-        //LOCATE LIB FOLDER
-        src.lib + '**',
+        //LOCATE bin FOLDER
+        src.bin + '**',
         //EXLCUDE SCSS FOLDER
-        '!' + src.lib + src.scss,
+        '!' + src.bin + src.scss,
         //EXCLUDE SCSS FILES
-        '!' + src.lib + src.scss + '**/*',
+        '!' + src.bin + src.scss + '**/*',
         //EXCLUDE PUG FOLDER
-        '!' + src.lib + src.pug,
+        '!' + src.bin + src.pug,
         //EXCLUDE PUG FILES
-        '!' + src.lib + src.pug + '**/*'
+        '!' + src.bin + src.pug + '**/*'
     ])
         //COPY TO DIST FOLDER
         .pipe(gulp.dest(src.dist))
@@ -143,8 +143,8 @@ gulp.task('minify', ['minify:js', 'minify:css']);
 
 //MINIFY JAVASCRIPT
 gulp.task('minify:js', function () {
-    //LOCATE JS FILES IN LIB JS FOLDER
-    return gulp.src(src.lib + src.js + '*.js')
+    //LOCATE JS FILES IN bin JS FOLDER
+    return gulp.src(src.bin + src.js + '*.js')
         //MINIFY
         .pipe(uglify())
         //RENAME WITH .MIN.JS PREFIX
@@ -154,8 +154,8 @@ gulp.task('minify:js', function () {
 });
 //MINIFY CSS
 gulp.task('minify:css', function () {
-    //LOCATE CSS FILES IN LIB FOLDER
-    return gulp.src(src.lib + src.css + '*.css')
+    //LOCATE CSS FILES IN bin FOLDER
+    return gulp.src(src.bin + src.css + '*.css')
         //MINIFY
         .pipe(cleanCSS())
         //RENAME WITH .MIN.CSS PREFIX
@@ -219,8 +219,8 @@ gulp.task('backup', function () {
     function backup() {
         //LOG DATE OF BACKUP
         logDate("Backed Up");
-        //LOCATE LIB FOLDER
-        gulp.src(src.lib + '**/*')
+        //LOCATE bin FOLDER
+        gulp.src(src.bin + '**/*')
             //COPY TO BACKUP FOLDER WITH DATE
             .pipe(gulp.dest(src.backup + getDate()));
     }
